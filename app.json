@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "android-test",
-    "slug": "android-test",
+    "name": "travely",
+    "slug": "travely",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,13 +15,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.travely"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.travely"
     },
     "web": {
       "favicon": "./assets/favicon.png"
