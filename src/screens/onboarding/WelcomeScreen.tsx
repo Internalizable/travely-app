@@ -21,36 +21,36 @@ const WelcomeScreen: React.FC<any> = ({navigation}) => {
 
     return (
         <Animatable.View ref={viewRef} animation="fadeIn" className={"flex flex-row h-screen w-screen bg-white"}>
-            <View className="absolute w-full h-full">
+            <View className="absolute w-screen h-screen flex flex-col justify-center items-center">
                 <Image
                     source={require('../../../assets/images/ic_welcome.png')}
                     style={tw`absolute z-10 w-[100%] h-[50%] top-[1%]`}
                 />
-                <View className={"absolute w-96 h-96 rounded-full bg-sky-200 z-5 -right-[61%]"}>
+                <View className={"absolute w-80 h-80 rounded-full bg-sky-200 z-5 -top-[5%] -right-[56%]"}>
                 </View>
-                <View className={"absolute w-96 h-96 rounded-full bg-red-100 z-5 top-[16.5%] -left-[65%]"}>
+                <View className={"absolute w-80 h-80 rounded-full bg-red-100 z-5 top-[16.5%] -left-[62%]"}>
                 </View>
-                <View className={"absolute flex flex-col top-[58%] left-[20%] justify-between items-center"}>
+                <View className={"absolute flex flex-col top-[60%] justify-between items-center"}>
                     <Text className={"font-extrabold text-4xl"}>Stay connected</Text>
                     <Text className={"font-extrabold text-4xl"}>everywhere.</Text>
 
-                    <View className={"my-10 flex flex-row bg-gray-100 rounded-xl w-64 h-12 items-center px-3"}>
+                    <TouchableOpacity className={"my-8 flex flex-row bg-gray-100 rounded-xl w-64 h-12 items-center px-3"} onPress={() => navigation.push("SignUpEmail")}>
                         <Image
                             source={require('../../../assets/images/ic_email.png')}
                             style={tw`w-7 h-7`}
                         />
-                        <Text className={"pl-7 text-xl font-medium text-[#FC4C02]"} onPress={() => navigation.push("SignUpEmail")}>
+                        <Text className={"pl-7 text-xl font-medium text-[#FC4C02]"}>
                             Sign up with email
                         </Text>
-                    </View>
+                    </TouchableOpacity>
 
                     <View className={"flex flex-row"}>
                         <Text className={"font-medium text-base"}>Already have an account?</Text>
-                        <Text className={"px-1 font-medium text-base text-[#FC4C02]"} onPress={() => navigation.push("SignInEmail")}>Sign in</Text>
+                        <Text className={"px-1 font-medium text-base text-[#FC4C02] underline"} onPress={() => navigation.push("SignInEmail")}>Sign in</Text>
                     </View>
                 </View>
 
-                <Text className={"absolute font-regular text-xs bottom-[5%] left-[5%] w-96 text-gray-400"}>By tapping Sign in and using Travely you agree to our Terms and Privacy Policy.</Text>
+                <Text className={"absolute font-regular text-xs bottom-[2%] left-[5%] w-80 text-gray-400"}>By tapping Sign in and using Travely you agree to our Terms and Privacy Policy.</Text>
             </View>
         </Animatable.View>
     );

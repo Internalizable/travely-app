@@ -31,6 +31,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import WelcomeScreen from "./src/screens/onboarding/WelcomeScreen";
 import OnboardingNavigator from "./src/screens/onboarding/OnboardingNavigator";
 import MainNavigator from "./src/screens/MainNavigator";
+import { UserContext } from './src/context/UserContext';
 const { width, height } = Dimensions.get('window');
 
 SplashScreen.preventAutoHideAsync();
@@ -38,6 +39,7 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
     const [screen, setActiveScreen] = useState<ActiveScreen>(ActiveScreen.HOME);
+    const [user, setUser] = useState<any | null>(null);
 
     useEffect(() => {
         async function prepare() {
@@ -76,12 +78,11 @@ export default function App() {
         return null;
     }
 
-    const isLoggedIn = false;
-
     return (
-        <NavigationContainer>
-            {isLoggedIn ? <MainNavigator /> : <OnboardingNavigator />}
-        </NavigationContainer>
-
+        <UserContext.Provider value={{user, setUser}}>
+            <NavigationContainer>
+                {user !== null ? <MainNavigator /> : <OnboardingNavigator />}
+            </NavigationContainer>
+        </UserContext.Provider>
     );
 }
