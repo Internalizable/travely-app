@@ -1,9 +1,5 @@
 import React, {useContext, useRef} from "react";
 import {
-    Alert,
-    Image,
-    ImageBackground,
-    Pressable,
     ScrollView,
     Text,
     TextInput,
@@ -14,22 +10,13 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import {
     faChevronLeft,
-    faChevronRight,
-    faHome,
-    faMagnifyingGlass,
-    faUser,
-    faWallet
 } from "@fortawesome/free-solid-svg-icons";
-import tw from "twrnc";
-import {SvgUri} from "react-native-svg";
-import FastImage from "react-native-fast-image";
 import * as Animatable from 'react-native-animatable';
 import {useFocusEffect} from "@react-navigation/native";
-import ConfettiCannon from 'react-native-confetti-cannon';
 import {OnboardingContext} from "../context/OnboardingContext";
 import Toast from "react-native-toast-message";
 
-const SignUpEmail: React.FC<any> = ({navigation}) => {
+const SignInEmail: React.FC<any> = ({navigation}) => {
 
     const onboardingContext = useContext(OnboardingContext);
 
@@ -56,10 +43,10 @@ const SignUpEmail: React.FC<any> = ({navigation}) => {
                     </View>
                 </TouchableOpacity>
                 <Text className="mt-10 font-bold text-4xl">
-                    What's your email?
+                    Enter your email
                 </Text>
                 <Text className="mt-10 font-medium text-2xl text-gray-400">
-                    Let's create an account with your email address
+                    Welcome back! 👋
                 </Text>
                 <TextInput
                     className={"mt-10 text-xl font-medium"}
@@ -81,11 +68,10 @@ const SignUpEmail: React.FC<any> = ({navigation}) => {
                                 text2: 'The email provided is incorrect!'
                             });
                             Vibration.vibrate();
-                            console.log("showed toast")
                             return;
                         }
 
-                        navigation.push("SignUpPassword")
+                        navigation.push("SignInPassword")
                     }}>
                         <Text className="font-bold text-xl text-white">
                             Next
@@ -97,4 +83,4 @@ const SignUpEmail: React.FC<any> = ({navigation}) => {
     );
 };
 
-export default SignUpEmail;
+export default SignInEmail;

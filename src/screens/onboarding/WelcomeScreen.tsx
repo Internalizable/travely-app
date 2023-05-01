@@ -50,7 +50,7 @@ const WelcomeScreen: React.FC<any> = ({navigation}) => {
                     </View>
                 </View>
 
-                <Text className={"absolute font-regular text-xs bottom-[2%] left-[5%] w-80 text-gray-400"}>By tapping Sign in and using Travely you agree to our Terms and Privacy Policy.</Text>
+                <Text className={"absolute font-regular text-xs bottom-[2.5%] left-[5%] w-80 text-gray-400"}>By tapping Sign in and using Travely you agree to our Terms and Privacy Policy.</Text>
             </View>
         </Animatable.View>
     );

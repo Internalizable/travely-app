@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useContext, useRef} from "react";
 import {Alert, Image, ImageBackground, Pressable, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import {
@@ -14,6 +14,9 @@ import {SvgUri} from "react-native-svg";
 import FastImage from "react-native-fast-image";
 import * as Animatable from 'react-native-animatable';
 import {useFocusEffect} from "@react-navigation/native";
+import {UserContext} from "../context/UserContext";
+import {getAuth} from "firebase/auth";
+import {auth} from "../../firebaseConfig";
 
 const ProfileScreen: React.FC<any> = ({props}) => {
 
@@ -24,6 +27,9 @@ const ProfileScreen: React.FC<any> = ({props}) => {
             viewRef!.current!.fadeIn!(500);
         }, [])
     );
+
+    const userContext = useContext(UserContext);
+    const { user, setUser } = userContext;
 
     return (
         <Animatable.View ref={viewRef} animation="fadeIn" className={"flex flex-grow"}>
@@ -46,7 +52,7 @@ const ProfileScreen: React.FC<any> = ({props}) => {
                                 Elie Sfeir
                             </Text>
                             <Text className={"font-medium text-base text-gray-500"}>
-                                internalizable@gmail.com
+                                {user?.email}
                             </Text>
                         </View>
                         <View className={"flex flex-row justify-center items-center w-6 h-6 bg-gray-200 rounded-full"}>
@@ -141,7 +147,7 @@ const ProfileScreen: React.FC<any> = ({props}) => {
                         </View>
                     </View>
 
-                    <View className={"mt-5 flex flex-row w-10/12 justify-between items-center"}>
+                    <TouchableOpacity className={"mt-5 flex flex-row w-10/12 justify-between items-center"} onPress={() => auth.signOut()}>
                         <View className={"flex flex-row justify-center items-center w-11 h-11 bg-red-400 rounded-full"}>
                             <FontAwesomeIcon color={"white"} size={20} icon={faRightFromBracket}/>
                         </View>
@@ -155,7 +161,7 @@ const ProfileScreen: React.FC<any> = ({props}) => {
                                 <FontAwesomeIcon size={12} icon={faChevronRight}/>
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
                     <View className={"mt-5 flex flex-row w-10/12 justify-between items-center mb-20"}>
                         <View className={"flex flex-row justify-center items-center w-11 h-11 bg-red-600 rounded-full"}>

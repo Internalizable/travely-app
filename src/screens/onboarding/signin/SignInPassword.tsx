@@ -30,12 +30,11 @@ import {UserContext} from "../../../context/UserContext";
 import {OnboardingContext} from "../context/OnboardingContext";
 import Toast from "react-native-toast-message";
 import firebase from "firebase/compat";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {auth} from "../../../../firebaseConfig";
 
 const SignUpPassword: React.FC<any> = ({navigation}) => {
 
-    const [password, onChangePassword] = React.useState('');
     const [loading, setLoading] = useState<boolean>(false);
 
     const onboardingContext = useContext(OnboardingContext);
@@ -64,10 +63,10 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                     </View>
                 </TouchableOpacity>
                 <Text className="mt-10 font-bold text-4xl">
-                    Choose a password
+                    Enter your password
                 </Text>
                 <Text className="mt-10 font-medium text-2xl text-gray-400">
-                    Create a secure password linked to your account.
+                    Let's sign you back in! Please enter your password
                 </Text>
                 <TextInput
                     className={"mt-10 text-xl font-medium"}
@@ -92,7 +91,7 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
 
                         setLoading(true)
 
-                        await createUserWithEmailAndPassword(auth, onboardedUser.email, onboardedUser.password)
+                        await signInWithEmailAndPassword(auth, onboardedUser.email, onboardedUser.password)
                             .then((userCredential) => {
                                 const user = userCredential.user;
                                 setUser(user)
@@ -101,7 +100,6 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                                 const errorCode = error.code;
                                 const errorMessage = error.message;
 
-                                console.log(errorMessage)
                                 Toast.show({
                                     type: 'error',
                                     text1: 'Error ' + errorCode,

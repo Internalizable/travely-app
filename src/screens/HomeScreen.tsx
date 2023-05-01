@@ -1,5 +1,16 @@
-import React, {useRef} from "react";
-import {Alert, Animated, Image, ImageBackground, Pressable, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import React, {useEffect, useRef, useState} from "react";
+import {
+    Alert,
+    Animated,
+    Image,
+    ImageBackground,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import {faHome, faMagnifyingGlass, faUser, faWallet} from "@fortawesome/free-solid-svg-icons";
 import tw from "twrnc";
@@ -8,15 +19,74 @@ import FastImage from "react-native-fast-image";
 import {useFocusEffect, useNavigation, useRoute} from "@react-navigation/native";
 import {ActiveScreen} from "../utils/ActiveScreen";
 import * as Animatable from 'react-native-animatable';
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+    getFirestore,
+} from 'firebase/firestore';
+import {db} from "../../firebaseConfig";
+import PulseLoading from "../components/PulseAnimation";
+
+interface Country {
+    code: string,
+    image: string,
+    region: string,
+    name: string,
+}
 
 const HomeScreen: React.FC<any> = ({props}) => {
     const viewRef = useRef<Animatable.View & View>(null);
+
+    const [euCountries, setEUCountries] = useState<Country[]>([]);
+    const [isEULoading, setEULoading] = useState<boolean>(true);
+
+    const [asCountries, setASCountries] = useState<Country[]>([]);
+    const [isASLoading, setASLoading] = useState<boolean>(true);
+
+    const [afCountries, setAFCountries] = useState<Country[]>([]);
+    const [isAFLoading, setAFLoading] = useState<boolean>(true);
+
+    const [naCountries, setNACountries] = useState<Country[]>([]);
+    const [isNALoading, setNALoading] = useState<boolean>(true);
 
     useFocusEffect(
         React.useCallback(() => {
             viewRef!.current!.fadeIn!(500);
         }, [])
     );
+
+    useEffect(() => {
+
+        getDocs(query(collection(db, "countries"),
+            where("region", "==", "EU")))
+            .then(res => {
+                setEUCountries(res.docs.map(doc => doc.data() as Country))
+                setEULoading(false)
+        });
+
+        getDocs(query(collection(db, "countries"),
+            where("region", "==", "AS")))
+            .then(res => {
+                setASCountries(res.docs.map(doc => doc.data() as Country))
+                setASLoading(false)
+            });
+
+        getDocs(query(collection(db, "countries"),
+            where("region", "==", "AF")))
+            .then(res => {
+                setAFCountries(res.docs.map(doc => doc.data() as Country))
+                setAFLoading(false)
+            });
+
+        getDocs(query(collection(db, "countries"),
+            where("region", "==", "NA")))
+            .then(res => {
+                setNACountries(res.docs.map(doc => doc.data() as Country))
+                setNALoading(false)
+            });
+    }, [])
 
     return (
         <Animatable.View ref={viewRef} animation="fadeIn" className={"flex flex-grow"}>
@@ -32,9 +102,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         <FontAwesomeIcon size={20} style={tw`ml-5`} icon={faMagnifyingGlass}/>
                     </View>
                     <View className={"w-4/5"}>
-                        <Text className={"text-base font-bold"}>
-                            Search for your destination
-                        </Text>
+                        <TextInput placeholder={"Search for your destination"} className={"text-base font-bold"}/>
                     </View>
                 </View>
 
@@ -53,7 +121,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         </View>
                         <Image
                             source={require('../../assets/images/green_cash_bag.png')}
-                            style={tw`w-[30%] h-[70%]`}
+                            style={tw`w-32 h-32`}
                         />
                     </View>
                 </View>
@@ -127,50 +195,27 @@ const HomeScreen: React.FC<any> = ({props}) => {
                     }}>
                         <View className={"w-5"}></View>
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
+                        {isEULoading ?
+                            [...Array(6)].map((item, index) => {
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
+                                console.log("Rrrr")
+                                return (
+                            <Pressable key={index}>
+                                <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                    <PulseLoading/>
+                                </View>
+                            </Pressable >)
+                        }) : euCountries.map((item, index) => (
+                                <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
+                                    <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                        <FastImage source={{uri: item.image, priority: FastImage.priority.normal}}
+                                                   resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
+                                        <Text className={"font-semi_bold text-black pt-1"}>{item.name}</Text>
+                                    </View>
+                                </Pressable >
+                        ))
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
+                        }
                     </ScrollView>
                 </View>
 
@@ -184,50 +229,23 @@ const HomeScreen: React.FC<any> = ({props}) => {
                     }}>
                         <View className={"w-5"}></View>
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
+                        {isASLoading ?
+                            [...Array(6)].map((item, index) => {
+                                return (
+                                    <Pressable key={index}>
+                                        <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                            <PulseLoading/>
+                                        </View>
+                                    </Pressable >)
+                            }) : asCountries.map((item, index) => (
+                                <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
+                                    <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                        <FastImage source={{uri: item.image, priority: FastImage.priority.normal}}
+                                                   resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
+                                        <Text className={"font-semi_bold text-black pt-1"}>{item.name}</Text>
+                                    </View>
+                                </Pressable >
+                            ))}
                     </ScrollView>
                 </View>
 
@@ -241,50 +259,23 @@ const HomeScreen: React.FC<any> = ({props}) => {
                     }}>
                         <View className={"w-5"}></View>
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
+                        {isAFLoading ?
+                            [...Array(6)].map((item, index) => {
+                                return (
+                                    <Pressable key={index}>
+                                        <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                            <PulseLoading/>
+                                        </View>
+                                    </Pressable >)
+                            }) : afCountries.map((item, index) => (
+                                <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
+                                    <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                        <FastImage source={{uri: item.image, priority: FastImage.priority.normal}}
+                                                   resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
+                                        <Text className={"font-semi_bold text-black pt-1"}>{item.name}</Text>
+                                    </View>
+                                </Pressable >
+                            ))}
                     </ScrollView>
                 </View>
 
@@ -298,50 +289,23 @@ const HomeScreen: React.FC<any> = ({props}) => {
                     }}>
                         <View className={"w-5"}></View>
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable >
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                <FastImage source={{uri: "https://firebasestorage.googleapis.com/v0/b/simly-dedfe.appspot.com/o/countries%2FESP.png?alt=media&token=59cdd766-c6d6-4787-a22a-55a62d571c2b", priority: FastImage.priority.normal}}
-                                           resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
-                                <Text className={"font-semi_bold text-black pt-1"}>Spain</Text>
-                            </View>
-                        </Pressable>
+                        {isNALoading ?
+                            [...Array(6)].map((item, index) => {
+                                return (
+                                    <Pressable key={index}>
+                                        <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                            <PulseLoading/>
+                                        </View>
+                                    </Pressable >)
+                            }) : naCountries.map((item, index) => (
+                                <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
+                                    <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                        <FastImage source={{uri: item.image, priority: FastImage.priority.normal}}
+                                                   resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
+                                        <Text className={"font-semi_bold text-black pt-1"}>{item.name}</Text>
+                                    </View>
+                                </Pressable >
+                            ))}
                     </ScrollView>
                 </View>
             </ScrollView>
