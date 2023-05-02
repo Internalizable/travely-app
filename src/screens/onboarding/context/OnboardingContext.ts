@@ -1,6 +1,8 @@
 import { createContext, Dispatch, SetStateAction } from 'react';
 
-interface IOnboardedUser {
+export interface IOnboardedUser {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
 }

@@ -4,19 +4,14 @@ import React, {useState} from "react";
 import SignUpEmail from "./signup/SignUpEmail";
 import SignInEmail from "./signin/SignInEmail";
 import SignUpPassword from "./signup/SignUpPassword";
-import { OnboardingContext } from './context/OnboardingContext';
+import {IOnboardedUser, OnboardingContext} from './context/OnboardingContext';
 import SignInPassword from "./signin/SignInPassword";
 
 const OnboardingStack = createStackNavigator();
 
-interface IOnboardedUser {
-    email: string,
-    password: string
-}
-
 const OnboardingNavigator: React.FC<any> = () => {
 
-    const [onboardedUser, setOnboardedUser] = useState<IOnboardedUser>({ email: '', password: '' });
+    const [onboardedUser, setOnboardedUser] = useState<IOnboardedUser>({ firstName: '', lastName: '', email: '', password: '' });
 
     return (
         <OnboardingContext.Provider value={{ onboardedUser, setOnboardedUser }}>

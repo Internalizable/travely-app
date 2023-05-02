@@ -95,6 +95,9 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                         await createUserWithEmailAndPassword(auth, onboardedUser.email, onboardedUser.password)
                             .then((userCredential) => {
                                 const user = userCredential.user;
+
+                                //todo call firestore and create a document in users/[user.uid]
+
                                 setUser(user)
                             })
                             .catch((error) => {

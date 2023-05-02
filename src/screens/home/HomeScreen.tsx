@@ -17,7 +17,7 @@ import tw from "twrnc";
 import {SvgUri} from "react-native-svg";
 import FastImage from "react-native-fast-image";
 import {useFocusEffect, useNavigation, useRoute} from "@react-navigation/native";
-import {ActiveScreen} from "../utils/ActiveScreen";
+import {ActiveScreen} from "../../utils/ActiveScreen";
 import * as Animatable from 'react-native-animatable';
 import {
     collection,
@@ -26,8 +26,10 @@ import {
     getDocs,
     getFirestore,
 } from 'firebase/firestore';
-import {db} from "../../firebaseConfig";
-import PulseLoading from "../components/PulseAnimation";
+import {db} from "../../../firebaseConfig";
+import PulseLoading from "../../components/PulseAnimation";
+import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder'
+import {LinearGradient} from "expo-linear-gradient";
 
 interface Country {
     code: string,
@@ -36,8 +38,9 @@ interface Country {
     name: string,
 }
 
-const HomeScreen: React.FC<any> = ({props}) => {
+const HomeScreen: React.FC<any> = ({navigation}) => {
     const viewRef = useRef<Animatable.View & View>(null);
+    const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient)
 
     const [euCountries, setEUCountries] = useState<Country[]>([]);
     const [isEULoading, setEULoading] = useState<boolean>(true);
@@ -50,6 +53,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
 
     const [naCountries, setNACountries] = useState<Country[]>([]);
     const [isNALoading, setNALoading] = useState<boolean>(true);
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -120,7 +124,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                             </View>
                         </View>
                         <Image
-                            source={require('../../assets/images/green_cash_bag.png')}
+                            source={require('../../../assets/images/green_cash_bag.png')}
                             style={tw`w-32 h-32`}
                         />
                     </View>
@@ -130,21 +134,21 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         Popular Destinations
                     </Text>
 
-                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false} onMoveShouldSetResponderCapture={() => {
-                        return true;
-                    }}>
+                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false}>
                         <View className={"w-5"}></View>
 
-                        <Pressable onPress={() => Alert.alert("PRESSED 1")}>
-                            <ImageBackground source={require('../../assets/images/uae.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                        <TouchableOpacity onPress={() => {
+                            console.log("PRESSED")
+                        }}>
+                            <ImageBackground source={require('../../../assets/images/uae.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>Saudi Arabia</Text>
                                 </View>
                             </ImageBackground>
-                        </Pressable >
+                        </TouchableOpacity >
 
                         <Pressable onPress={() => Alert.alert("PRESSED 2")}>
-                            <ImageBackground source={require('../../assets/images/france.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                            <ImageBackground source={require('../../../assets/images/france.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>France</Text>
                                 </View>
@@ -152,7 +156,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         </Pressable >
 
                         <Pressable onPress={() => Alert.alert("PRESSED 3")}>
-                            <ImageBackground source={require('../../assets/images/uk.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                            <ImageBackground source={require('../../../assets/images/uk.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>United Kingdom</Text>
                                 </View>
@@ -160,7 +164,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         </Pressable >
 
                         <Pressable onPress={() => Alert.alert("PRESSED 4")}>
-                            <ImageBackground source={require('../../assets/images/italy.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                            <ImageBackground source={require('../../../assets/images/italy.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>Italy</Text>
                                 </View>
@@ -168,7 +172,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         </Pressable >
 
                         <Pressable onPress={() => Alert.alert("PRESSED 5")}>
-                            <ImageBackground source={require('../../assets/images/usa.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                            <ImageBackground source={require('../../../assets/images/usa.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>United States of America</Text>
                                 </View>
@@ -176,7 +180,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         </Pressable >
 
                         <Pressable onPress={() => Alert.alert("PRESSED 5")}>
-                            <ImageBackground source={require('../../assets/images/australia.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
+                            <ImageBackground source={require('../../../assets/images/australia.jpg')} imageStyle={tw`rounded-3xl`} className={"w-44 h-44"}>
                                 <View style={{position: 'absolute', top: 20, left: 20, right: 0, bottom: 0}}>
                                     <Text className={"font-semi_bold text-white"}>Australia</Text>
                                 </View>
@@ -190,23 +194,27 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         Europe
                     </Text>
 
-                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false} onMoveShouldSetResponderCapture={() => {
-                        return true;
-                    }}>
+                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false}>
                         <View className={"w-5"}></View>
 
                         {isEULoading ?
                             [...Array(6)].map((item, index) => {
-
-                                console.log("Rrrr")
                                 return (
-                            <Pressable key={index}>
-                                <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                    <PulseLoading/>
-                                </View>
-                            </Pressable >)
+                                    <Pressable key={index}>
+                                        <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
+                                            <ShimmerPlaceholder visible={!isEULoading} shimmerStyle={{
+                                                width: 48,
+                                                height: 48,
+                                                backgroundColor: '#E5E7EB',
+                                                borderRadius: 24
+                                            }}/>
+                                        </View>
+                                    </Pressable>)
                         }) : euCountries.map((item, index) => (
-                                <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
+                                <Pressable onPress={() => navigation.push("Tours", {
+                                    iso: item.code,
+                                    name: item.name
+                                })} key={index}>
                                     <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
                                         <FastImage source={{uri: item.image, priority: FastImage.priority.normal}}
                                                    resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
@@ -224,9 +232,7 @@ const HomeScreen: React.FC<any> = ({props}) => {
                         Asia
                     </Text>
 
-                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false} onMoveShouldSetResponderCapture={() => {
-                        return true;
-                    }}>
+                    <ScrollView className={"w-[93%] flex flex-row gap-2 overflow-visible mt-2"} horizontal={true} showsHorizontalScrollIndicator={false}>
                         <View className={"w-5"}></View>
 
                         {isASLoading ?
@@ -234,9 +240,14 @@ const HomeScreen: React.FC<any> = ({props}) => {
                                 return (
                                     <Pressable key={index}>
                                         <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                            <PulseLoading/>
+                                            <ShimmerPlaceholder visible={!isEULoading} shimmerStyle={{
+                                                width: 48,
+                                                height: 48,
+                                                backgroundColor: '#E5E7EB',
+                                                borderRadius: 24
+                                            }}/>
                                         </View>
-                                    </Pressable >)
+                                    </Pressable>)
                             }) : asCountries.map((item, index) => (
                                 <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
                                     <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
@@ -264,9 +275,14 @@ const HomeScreen: React.FC<any> = ({props}) => {
                                 return (
                                     <Pressable key={index}>
                                         <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                            <PulseLoading/>
+                                            <ShimmerPlaceholder visible={!isEULoading} shimmerStyle={{
+                                                width: 48,
+                                                height: 48,
+                                                backgroundColor: '#E5E7EB',
+                                                borderRadius: 24
+                                            }}/>
                                         </View>
-                                    </Pressable >)
+                                    </Pressable>)
                             }) : afCountries.map((item, index) => (
                                 <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
                                     <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
@@ -294,9 +310,14 @@ const HomeScreen: React.FC<any> = ({props}) => {
                                 return (
                                     <Pressable key={index}>
                                         <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>
-                                            <PulseLoading/>
+                                            <ShimmerPlaceholder visible={!isEULoading} shimmerStyle={{
+                                                width: 48,
+                                                height: 48,
+                                                backgroundColor: '#E5E7EB',
+                                                borderRadius: 24
+                                            }}/>
                                         </View>
-                                    </Pressable >)
+                                    </Pressable>)
                             }) : naCountries.map((item, index) => (
                                 <Pressable onPress={() => Alert.alert("PRESSED 1")} key={index}>
                                     <View className={"w-28 h-28 rounded-2xl bg-[#f9f7f7] flex flex-col justify-center items-center"}>

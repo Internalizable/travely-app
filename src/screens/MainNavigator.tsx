@@ -3,9 +3,10 @@ import React from "react";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {faHome, faUser, faWallet} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import HomeScreen from "./HomeScreen";
+import HomeScreen from "./home/HomeScreen";
 import WalletScreen from "./WalletScreen";
 import ProfileScreen from "./ProfileScreen";
+import HomeNavigator from "./home/HomeNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -29,7 +30,7 @@ const MainNavigator: React.FC<any> = () => {
             tabBarActiveTintColor: 'black',
             tabBarInactiveTintColor: 'gray',
         })}>
-            <Tab.Screen name="Home" component={HomeScreen}/>
+            <Tab.Screen name="Home" component={HomeNavigator}/>
             <Tab.Screen name="Wallet" component={WalletScreen}/>
             <Tab.Screen name="Profile" component={ProfileScreen}/>
         </Tab.Navigator>
