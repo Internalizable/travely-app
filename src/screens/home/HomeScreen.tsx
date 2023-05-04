@@ -211,7 +211,7 @@ const HomeScreen: React.FC<any> = ({navigation}) => {
                                         </View>
                                     </Pressable>)
                         }) : euCountries.map((item, index) => (
-                                <Pressable onPress={() => navigation.push("Tours", {
+                                <TouchableOpacity onPress={() => navigation.push("Tours", {
                                     iso: item.code,
                                     name: item.name
                                 })} key={index}>
@@ -220,7 +220,7 @@ const HomeScreen: React.FC<any> = ({navigation}) => {
                                                    resizeMode={FastImage.resizeMode.contain} style={{ width: 48, height: 48 }}/>
                                         <Text className={"font-semi_bold text-black pt-1"}>{item.name}</Text>
                                     </View>
-                                </Pressable >
+                                </TouchableOpacity >
                         ))
 
                         }

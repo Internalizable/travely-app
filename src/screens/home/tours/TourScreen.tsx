@@ -1,9 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
 import * as Animatable from "react-native-animatable";
-import {Button, Image, Pressable, ScrollView, Text, TextInput, TouchableOpacity, Vibration, View} from "react-native";
+import {
+    Button,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Vibration,
+    View
+} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import {faChevronLeft, faLocationDot, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {faChevronLeft, faLocationDot, faMagnifyingGlass, faX} from "@fortawesome/free-solid-svg-icons";
 import Toast from "react-native-toast-message";
 import FastImage from "react-native-fast-image";
 import tw from "twrnc";
@@ -11,6 +22,7 @@ import {collection, getDocs, query, where} from "firebase/firestore";
 import {db} from "../../../../firebaseConfig";
 import {createShimmerPlaceholder} from "react-native-shimmer-placeholder";
 import {LinearGradient} from "expo-linear-gradient";
+import {Calendar, LocaleConfig} from 'react-native-calendars';
 
 interface TourType {
     name: string;
@@ -25,11 +37,22 @@ const TourScreen: React.FC<any> = ({navigation, route}) => {
 
     const [tours, setTours] = useState<TourType[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
+    const [isModalVisible, setModalVisible] = useState<boolean>(false);
+    const [selectedDate, setSelectedDate] = useState<string>();
 
     const iso = route.params.iso;
     const name = route.params.name;
 
     const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient)
+    const today = new Date().toISOString().split('T')[0];
+
+    const markedDates = selectedDate ? {
+        [selectedDate]: {
+            selected: true,
+            selectedColor: 'blue',
+        },
+    } : {};
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -61,10 +84,61 @@ const TourScreen: React.FC<any> = ({navigation, route}) => {
                     </Text>
                 </View>
 
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={isModalVisible}
+                    onRequestClose={() => {
+                        setModalVisible(!isModalVisible);
+                    }}>
+                    <View className={"flex flex-col w-full h-full justify-center"}>
+
+                        <View className={"flex flex-col w-full h-64 justify-center bg-white rounded-t-3xl shadow-xl"}>
+                            <View className={"flex flex-row items-center justify-end bg-white pr-5 pt-5"}>
+                                <TouchableOpacity onPress={() => setModalVisible(!isModalVisible)} className={"flex flex-row justify-center items-center w-10 h-10 bg-gray-200 rounded-full"}>
+                                    <View className={"font-extra_bold"}>
+                                        <FontAwesomeIcon size={14} icon={faX}/>
+                                    </View>
+
+                                </TouchableOpacity>
+                            </View>
+
+                            <Calendar minDate={today}
+                                      onDayPress={day => {
+                                          setSelectedDate(day.dateString);
+                                      }}
+                                      markedDates={markedDates}/>
+                            <View className={"flex flex-row items-center justify-end bg-white pr-5 pt-5 pb-5 rounded-b-3xl"}>
+                                <TouchableOpacity onPress={() => {
+
+                                    if(!selectedDate) {
+                                        Toast.show({
+                                            type: 'error',
+                                            text1: 'Error',
+                                            text2: "You need to have a date selected."
+                                        });
+
+                                        return;
+                                    }
+
+                                    setModalVisible(false)
+                                }}>
+                                    <View className={"flex flex-row items-center justify-center w-28 h-10 bg-[#FAA935FF] rounded-xl"}>
+                                        <Text className={"text-lg text-white font-regular"}>
+                                            Continue
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+                </Modal>
+
                 {
                     isLoading ? [...Array(6)].map((item, index) => {
                             return (
-                                <View key={index} className="max-w-sm rounded-2xl overflow-hidden shadow-xl px-5">
+                                <View key={index} className="max-w-sm rounded-2xl overflow-hidden shadow-xl px-5 my-2">
                                     <View className={"w-full h-56 rounded-xl overflow-hidden"}>
                                         <ShimmerPlaceholder visible={!isLoading} shimmerStyle={{
                                             width: "100%",
@@ -99,9 +173,9 @@ const TourScreen: React.FC<any> = ({navigation, route}) => {
                                 </View>
                             )
                         }): tours.map((e: TourType, index: number) =>
-                                <View key={index} className="max-w-sm rounded-2xl overflow-hidden shadow-xl px-5">
+                                <View key={index} className="w-full h-[24rem] rounded-2xl shadow-xl px-5 bg-transparent">
                                     <View className={"w-full h-56 rounded-xl overflow-hidden"}>
-                                        <FastImage className={"w-full h-full"} source={{uri: e.image, priority: FastImage.priority.normal}}
+                                        <FastImage style={{overflow: "hidden"}} className={"w-full h-full overflow-hidden"} source={{uri: e.image, priority: FastImage.priority.normal}}
                                                    resizeMode={FastImage.resizeMode.contain}/>
                                     </View>
                                     <View className="px-6 py-4">
@@ -116,7 +190,7 @@ const TourScreen: React.FC<any> = ({navigation, route}) => {
                                             <Text className={"text-lg font-bold text-[#FAA935FF]"}>
                                                 {e.price}$/person
                                             </Text>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity onPress={() => setModalVisible(true)}>
                                                 <View className={"flex flex-row items-center justify-center w-28 h-10 bg-[#FAA935FF] rounded-lg"}>
                                                     <Text className={"text-lg text-white font-regular"}>
                                                         Book Now
