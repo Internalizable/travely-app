@@ -31,7 +31,8 @@ import {OnboardingContext} from "../context/OnboardingContext";
 import Toast from "react-native-toast-message";
 import firebase from "firebase/compat";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import {auth} from "../../../../firebaseConfig";
+import {auth, db} from "../../../../firebaseConfig";
+import {setDoc, collection, doc} from "firebase/firestore";
 
 const SignUpPassword: React.FC<any> = ({navigation}) => {
 
@@ -45,7 +46,7 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
         throw new Error('SignUpEmail must be rendered within an OnboardingContext.Provider');
 
     const { onboardedUser, setOnboardedUser } = onboardingContext;
-    const { user, setUser } = userContext;
+    const { user, setUser, setClaims } = userContext;
 
     const viewRef = useRef<Animatable.View & View>(null);
 
@@ -65,9 +66,6 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                 </TouchableOpacity>
                 <Text className="mt-10 font-bold text-4xl">
                     Choose a password
-                </Text>
-                <Text className="mt-10 font-medium text-2xl text-gray-400">
-                    Create a secure password linked to your account.
                 </Text>
                 <TextInput
                     className={"mt-10 text-xl font-medium"}
@@ -93,12 +91,24 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                         setLoading(true)
 
                         await createUserWithEmailAndPassword(auth, onboardedUser.email, onboardedUser.password)
-                            .then((userCredential) => {
+                            .then(async (userCredential) => {
                                 const user = userCredential.user;
 
-                                //todo call firestore and create a document in users/[user.uid]
+                                const userRef = doc(db, `users`, user.uid);
 
-                                setUser(user)
+                                await setDoc(userRef, {
+                                    id: user.uid,
+                                    firstName: onboardedUser.firstName,
+                                    lastName: onboardedUser.lastName,
+                                    country: onboardedUser.country,
+                                    email: onboardedUser.email,
+                                    admin: false,
+                                }).then((res) => {
+                                    setUser(user)
+                                    setClaims({
+                                        admin: false
+                                    })
+                                })
                             })
                             .catch((error) => {
                                 const errorCode = error.code;

@@ -34,7 +34,7 @@ const WelcomeScreen: React.FC<any> = ({navigation}) => {
                     <Text className={"font-extrabold text-4xl"}>Stay connected</Text>
                     <Text className={"font-extrabold text-4xl"}>everywhere.</Text>
 
-                    <TouchableOpacity className={"my-8 flex flex-row bg-gray-100 rounded-xl w-64 h-12 items-center px-3"} onPress={() => navigation.push("SignUpEmail")}>
+                    <TouchableOpacity className={"my-8 flex flex-row bg-gray-100 rounded-xl w-64 h-12 items-center px-3"} onPress={() => navigation.push("SignUpFirstName")}>
                         <Image
                             source={require('../../../assets/images/ic_email.png')}
                             style={tw`w-7 h-7`}

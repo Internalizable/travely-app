@@ -6,12 +6,15 @@ import SignInEmail from "./signin/SignInEmail";
 import SignUpPassword from "./signup/SignUpPassword";
 import {IOnboardedUser, OnboardingContext} from './context/OnboardingContext';
 import SignInPassword from "./signin/SignInPassword";
+import SignUpFirstName from "./signup/SignUpFirstName";
+import SignUpLastName from "./signup/SignUpLastName";
+import SignUpCountry from "./signup/SignUpCountry";
 
 const OnboardingStack = createStackNavigator();
 
 const OnboardingNavigator: React.FC<any> = () => {
 
-    const [onboardedUser, setOnboardedUser] = useState<IOnboardedUser>({ firstName: '', lastName: '', email: '', password: '' });
+    const [onboardedUser, setOnboardedUser] = useState<IOnboardedUser>({ firstName: '', lastName: '', country: '', email: '', password: '' });
 
     return (
         <OnboardingContext.Provider value={{ onboardedUser, setOnboardedUser }}>
@@ -29,6 +32,21 @@ const OnboardingNavigator: React.FC<any> = () => {
                 <OnboardingStack.Screen
                     name="SignInPassword"
                     component={SignInPassword}
+                    options={{ headerShown: false }}
+                />
+                <OnboardingStack.Screen
+                    name="SignUpFirstName"
+                    component={SignUpFirstName}
+                    options={{ headerShown: false }}
+                />
+                <OnboardingStack.Screen
+                    name="SignUpLastName"
+                    component={SignUpLastName}
+                    options={{ headerShown: false }}
+                />
+                <OnboardingStack.Screen
+                    name="SignUpCountry"
+                    component={SignUpCountry}
                     options={{ headerShown: false }}
                 />
                 <OnboardingStack.Screen

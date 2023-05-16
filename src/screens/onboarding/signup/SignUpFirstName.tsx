@@ -29,16 +29,15 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import {OnboardingContext} from "../context/OnboardingContext";
 import Toast from "react-native-toast-message";
 
-const SignUpEmail: React.FC<any> = ({navigation}) => {
+const SignUpFirstName: React.FC<any> = ({navigation}) => {
 
     const onboardingContext = useContext(OnboardingContext);
 
     if (!onboardingContext)
-        throw new Error('SignUpEmail must be rendered within an OnboardingContext.Provider');
+        throw new Error('SignUpFirstName must be rendered within an OnboardingContext.Provider');
 
     const { onboardedUser, setOnboardedUser } = onboardingContext;
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const viewRef = useRef<Animatable.View & View>(null);
 
     useFocusEffect(
@@ -56,33 +55,30 @@ const SignUpEmail: React.FC<any> = ({navigation}) => {
                     </View>
                 </TouchableOpacity>
                 <Text className="mt-10 font-bold text-4xl">
-                    What's your email?
+                    What's your first name?
                 </Text>
                 <TextInput
                     className={"mt-10 text-xl font-medium"}
                     onChangeText={(text) => setOnboardedUser({
                         ...onboardedUser,
-                        email: text
+                        firstName: text
                     })}
-                    value={onboardedUser.email}
-                    placeholder="Email"
+                    value={onboardedUser.firstName}
+                    placeholder="First Name"
                 />
                 <View className={"mt-10 w-full flex flex-row justify-center items-center"}>
                     <TouchableOpacity className={"flex flex-row items-center justify-center w-48 h-14 rounded-xl bg-[#FC4C02]"} onPress={() => {
-                        const isValidEmail = emailRegex.test(onboardedUser.email);
-
-                        if(!isValidEmail) {
+                        if(onboardedUser.firstName.length <= 1) {
                             Toast.show({
                                 type: 'error',
-                                text1: 'Invalid email',
-                                text2: 'The email provided is incorrect!'
+                                text1: 'Invalid first name',
+                                text2: 'First name should be longer!'
                             });
                             Vibration.vibrate();
-                            console.log("showed toast")
                             return;
                         }
 
-                        navigation.push("SignUpPassword")
+                        navigation.push("SignUpLastName")
                     }}>
                         <Text className="font-bold text-xl text-white">
                             Next
@@ -94,4 +90,4 @@ const SignUpEmail: React.FC<any> = ({navigation}) => {
     );
 };
 
-export default SignUpEmail;
+export default SignUpFirstName;

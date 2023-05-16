@@ -31,7 +31,8 @@ import {OnboardingContext} from "../context/OnboardingContext";
 import Toast from "react-native-toast-message";
 import firebase from "firebase/compat";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import {auth} from "../../../../firebaseConfig";
+import {auth, db} from "../../../../firebaseConfig";
+import {collection, doc, getDoc} from "firebase/firestore";
 
 const SignUpPassword: React.FC<any> = ({navigation}) => {
 
@@ -44,7 +45,7 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
         throw new Error('SignUpEmail must be rendered within an OnboardingContext.Provider');
 
     const { onboardedUser, setOnboardedUser } = onboardingContext;
-    const { user, setUser } = userContext;
+    const { user, setUser, setClaims, claims } = userContext;
 
     const viewRef = useRef<Animatable.View & View>(null);
 
@@ -92,9 +93,25 @@ const SignUpPassword: React.FC<any> = ({navigation}) => {
                         setLoading(true)
 
                         await signInWithEmailAndPassword(auth, onboardedUser.email, onboardedUser.password)
-                            .then((userCredential) => {
+                            .then(async (userCredential) => {
                                 const user = userCredential.user;
-                                setUser(user)
+
+                                const docRef = doc(db, "users", user.uid);
+                                const userDocument = await getDoc(docRef);
+
+                                if(userDocument.exists()) {
+                                    setUser(user)
+                                    setClaims({
+                                        admin: userDocument.data().admin
+                                    })
+                                } else {
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: 'Error 404',
+                                        text2: "The user doesn't exist in the database"
+                                    });
+                                }
+
                             })
                             .catch((error) => {
                                 const errorCode = error.code;

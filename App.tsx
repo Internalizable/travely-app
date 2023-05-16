@@ -10,12 +10,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import OnboardingNavigator from "./src/screens/onboarding/OnboardingNavigator";
 import MainNavigator from "./src/screens/MainNavigator";
-import {UserContext} from './src/context/UserContext';
+import {IClaims, UserContext} from './src/context/UserContext';
 import Toast from 'react-native-toast-message';
 import {ToastConfig} from "react-native-toast-message/lib/src/types";
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {User} from "@firebase/auth";
-import {auth} from "./firebaseConfig";
+import {auth, db} from "./firebaseConfig";
+import {doc, getDoc} from "firebase/firestore";
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,7 +24,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
+
     const [user, setUser] = useState<User | null>(null);
+    const [claims, setClaims] = useState<IClaims | null>(null);
 
     useEffect(() => {
         async function prepare() {
@@ -37,9 +40,18 @@ export default function App() {
                     semi_bold:  require('./assets/fonts/semi_bold.ttf'),
                 });
 
-                auth.onAuthStateChanged((user) => {
+                auth.onAuthStateChanged(async (user) => {
                     if (user) {
-                        setUser(user);
+                        const docRef = doc(db, "users", user.uid);
+                        const userDocument = await getDoc(docRef);
+
+                        if (userDocument.exists()) {
+                            setUser(user)
+                            setClaims({
+                                admin: userDocument.data().admin
+                            })
+                        } else
+                            setUser(null);
                     } else {
                         setUser(null);
                     }
@@ -85,7 +97,7 @@ export default function App() {
     };
 
     return (
-        <UserContext.Provider value={{user, setUser}}>
+        <UserContext.Provider value={{user, setUser, claims, setClaims}}>
             <NavigationContainer>
                 {user !== null ? <MainNavigator /> : <OnboardingNavigator />}
             </NavigationContainer>
